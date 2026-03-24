@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=1080, initial-scale=1.0" />
+        <title>Catch Golden BROWN!</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Pretendard&amp;display=swap" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+        <style>
+            body {
+                background: url(./img/bg.png);
+                background-repeat: repeat;
+                background-size: 100%;
+                font-family: "Pretendard", sans-serif;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            .container {
+                height: 1920px;
+                max-width: 1080px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .wrap {
+                width: 880px;
+                height: 1920px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                padding: 40px;
+                position: relative;
+            }
+
+            .roulette-box {
+                display: flex;
+                justify-content: center;
+                position: relative;
+                margin-top: 300px;
+                width: 100%;
+                height: 800px;
+                opacity: 1;
+                transition: opacity 0.2s ease-in-out;
+                z-index: 10000;
+            }
+
+            .roulette-box .cha,
+            .roulette-box .hand,
+            .roulette-box .star,
+            .roulette-box .roulette-circle,
+            .roulette-box .start-btn {
+                opacity: 1;
+                transition: opacity 0.2s ease-in-out;
+            }
+
+            .roulette-box .cha {
+                width: 70%;
+                position: absolute;
+                top: -229px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: -1;
+            }
+
+            .roulette-box .hand {
+                position: absolute;
+                width: 30%;
+                left: 188px;
+                top: -7px;
+                z-index: 3;
+            }
+
+            .roulette-box .star {
+                position: absolute;
+                top: -82px;
+                width: 65px;
+                right: 125px;
+            }
+
+            .roulette-circle {
+                background: url(./img/one2.svg) center center no-repeat;
+                background-size: 100%;
+            }
+
+            .roulette-box .roulette-circle {
+                position: relative;
+                width: 100%;
+                max-width: 750px;
+                height: 800px;
+                aspect-ratio: 1 / 1;
+                z-index: 2;
+                display: flex;
+                justify-content: center;
+                margin: 0 auto;
+            }
+
+            .roulette-box .roulette-circle svg #rotate-img {
+                transform-origin: 354.5px 322px;
+                transform: rotate(0deg);
+                transition: transform 0s linear;
+            }
+
+            .roulette-box .start-btn {
+                position: absolute;
+                width: 50%;
+                left: 50%;
+                bottom: -80px;
+                transform: translateX(-50%);
+                z-index: 3;
+                border: none;
+                background-color: transparent;
+                cursor: pointer;
+                max-width: 455px;
+                outline: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .roulette-box .start-btn:focus {
+                outline: none;
+                box-shadow: none;
+            }
+
+            .roulette-box .start-btn img {
+                width: 100%;
+                height: 100%;
+                display: block;
+                -webkit-user-drag: none;
+            }
+
+            .roulette-box .restart-btn {
+                position: absolute;
+                width: 50%;
+                left: 50%;
+                bottom: 0;
+                transform: translateX(-50%);
+                z-index: 20;
+                border: none;
+                background-color: transparent;
+                cursor: pointer;
+                display: none;
+                outline: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .roulette-box .restart-btn:focus {
+                outline: none;
+                box-shadow: none;
+            }
+
+            .roulette-box .restart-btn img {
+                width: 100%;
+                height: 100%;
+                display: block;
+                -webkit-user-drag: none;
+            }
+
+            /* 당첨 안내 이미지 스타일 수정 */
+            .roulette-box .result-image {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translate(-50%, 0);
+                width: 100%;
+                max-width: 800px;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                animation: fadeIn 0.2s ease-in-out forwards;
+            }
+
+            /* 당첨 안내 페이지일 때의 스타일 */
+            .roulette-box:has(.result-image) {
+                margin-top: 200px;
+                height: 100%;
+            }
+
+            .roulette-box:has(.result-image) .cha,
+            .roulette-box:has(.result-image) .hand,
+            .roulette-box:has(.result-image) .star,
+            .roulette-box:has(.result-image) .roulette-circle,
+            .roulette-box:has(.result-image) .start-btn {
+                opacity: 0;
+            }
+
+            .roulette-box .result-image img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            .roulette-box:has(.result-image) .start-btn {
+                display: none;
+            }
+
+            .text-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 120px;
+            }
+            .text-box .title {
+                width: 75%;
+                max-width: 640px;
+            }
+            .text-box .title img {
+                display: block;
+                width: 100%;
+                height: auto;
+            }
+            .text-box .desc {
+                width: 100%;
+                height: auto;
+                margin: 0 auto;
+            }
+            .text-box .desc img {
+                width: 100%;
+                display: block;
+            }
+
+            .win-popup {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+
+            .win-popup .popup-content {
+                background: transparent;
+                border-radius: 24px;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+                position: relative;
+                animation: popup-in 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+            }
+
+            @keyframes popup-in {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.7);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            .win-popup .close-popup {
+                margin-top: 24px;
+                padding: 12px 32px;
+                font-size: 1.1rem;
+                border: none;
+                border-radius: 8px;
+                background: #ffe066;
+                color: #222;
+                cursor: pointer;
+                font-weight: bold;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .result-box {
+                display: none;
+                position: relative;
+                margin-top: 350px;
+                width: 100%;
+                height: auto;
+                opacity: 0;
+                transition: opacity 0.2s ease-in-out;
+                z-index: 10000;
+            }
+
+            .result-box.show {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                opacity: 1;
+                margin-top: 210px;
+            }
+
+            .result-box .result-image {
+                width: 100%;
+                max-width: 880px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                animation: popupAnimation 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                padding-bottom: 120px;
+            }
+
+            .result-box .result-image img {
+                width: 100%;
+                height: auto;
+                display: block;
+                animation: imagePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+                position: relative;
+                z-index: 2;
+            }
+
+            @keyframes popupAnimation {
+                0% {
+                    transform: scale(0.3);
+                    opacity: 0;
+                }
+                50% {
+                    transform: scale(1.1);
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes imagePop {
+                0% {
+                    transform: scale(0.5);
+                    opacity: 0;
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .result-box .result-image .restart-btn {
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                border: none;
+                background-color: transparent;
+                cursor: pointer;
+                z-index: 20;
+                width: 50%;
+                max-width: 223px;
+                outline: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .result-box .result-image .restart-btn:focus {
+                outline: none;
+                box-shadow: none;
+            }
+
+            /* 기존의 roulette-box 관련 스타일 수정 */
+            .roulette-box .result-image {
+                display: none;
+            }
+
+            .roulette-box:has(.result-image) {
+                display: none;
+            }
+
+            .fancy-button {
+                margin: auto;
+                position: relative;
+            }
+
+            #lottie-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, calc(-50% - 200px));
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0;
+                background: transparent;
+                transition: opacity 0.3s ease-in-out;
+                visibility: hidden;
+                max-width: 5000px;
+                margin: 0 auto;
+            }
+
+            #lottie-container.show {
+                opacity: 1;
+                z-index: 20000;
+                visibility: visible;
+            }
+
+            #lottie-container.initialized {
+                z-index: 20000;
+                visibility: visible;
+            }
+
+            #lottie-container svg {
+                width: 100%;
+                height: 100%;
+                max-width: 5000px;
+                margin: 0 auto;
+            }
+
+            /* Lottie 애니메이션 초기화 전 숨김 처리 */
+            #lottie-container:not(.initialized) {
+                visibility: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="wrap">
+                <div class="roulette-box">
+                    <img src="./img/line.png" alt="" class="cha" />
+                    <img src="./img/hand.png" alt="" class="hand" />
+                    <img src="./img/star.png" alt="" class="star" />
+                    <div class="roulette-circle">
+                        <svg width="750" height="800" viewBox="0 0 709 644">
+                            <g id="rotate-img">
+                                <image class="golden-brown-img" href="./img/noo_golden.png" x="154.5" y="122" width="400" height="400" style="pointer-events: none" />
+                            </g>
+                        </svg>
+                    </div>
+                    <button class="start-btn">
+                        <img src="./img/start.png" alt="START" draggable="false" />
+                    </button>
+                    <button class="restart-btn">
+                        <img src="./img/restart.png" alt="" draggable="false" />
+                    </button>
+                </div>
+
+                <div class="result-box">
+                    <div class="result-image">
+                        <div id="lottie-container"></div>
+                        <img src="./img/gray.png" alt="당첨 이미지" />
+                        <button class="restart-btn">
+                            <img src="./img/restart.png" alt="" draggable="false" />
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-box">
+                    <div class="title">
+                        <img src="./img/logo.png" />
+                    </div>
+
+                    <div class="desc">
+                        <img src="./img/notice.svg" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            let lottieAnimation;
+            let isLottieLoaded = false;
+
+            // Lottie 애니메이션 초기화
+            function initLottieAnimation() {
+                return new Promise((resolve, reject) => {
+                    try {
+                        console.log("Initializing Lottie animation...");
+                        const container = document.getElementById("lottie-container");
+                        
+                        // 기존 애니메이션이 있다면 제거
+                        if (lottieAnimation) {
+                            lottieAnimation.destroy();
+                        }
+
+                        lottieAnimation = lottie.loadAnimation({
+                            container: container,
+                            renderer: "svg",
+                            loop: false,
+                            autoplay: false,
+                            path: "./animation.json"
+                        });
+
+                        // 애니메이션 로드 완료 이벤트
+                        lottieAnimation.addEventListener("DOMLoaded", function () {
+                            console.log("Lottie animation loaded successfully");
+                            container.classList.add("initialized");
+                            isLottieLoaded = true;
+                            resolve();
+                        });
+
+                        // 애니메이션 에러 이벤트
+                        lottieAnimation.addEventListener("error", function (err) {
+                            console.error("Lottie animation error:", err);
+                            reject(err);
+                        });
+
+                        // 애니메이션 완료 이벤트
+                        lottieAnimation.addEventListener("complete", function () {
+                            console.log("Lottie animation completed");
+                        });
+
+                    } catch (error) {
+                        console.error("Error initializing Lottie:", error);
+                        reject(error);
+                    }
+                });
+            }
+
+            // 페이지 로드 시 Lottie 초기화
+            window.addEventListener("load", async function () {
+                console.log("Window loaded, initializing Lottie...");
+                try {
+                    await initLottieAnimation();
+                    console.log("Lottie animation initialized successfully");
+                } catch (error) {
+                    console.error("Failed to initialize Lottie:", error);
+                }
+            });
+
+            const items = [
+                {
+                    name: "Gray",
+                    img: "./img/noo_gray.png",
+                    chance: 700,
+                    reward: "Claw Machine Coin",
+                    popup: "./img/popup_gray.png",
+                },
+                {
+                    name: "Blue",
+                    img: "./img/noo_blue.png",
+                    chance: 100,
+                    reward: "minini-chu",
+                    popup: "./img/popup_blue.png",
+                },
+                {
+                    name: "Pink",
+                    img: "./img/noo_pink.png",
+                    chance: 1000,
+                    reward: "10% Discount Coupon",
+                    popup: "./img/popup_pink.png",
+                },
+                {
+                    name: "Golden",
+                    img: "./img/noo_golden.png",
+                    chance: 200,
+                    reward: "30% Discount Coupon",
+                    popup: "./img/popup_golden.png",
+                },
+            ];
+
+            // 팝업 이미지 미리 로드
+            function preloadImages() {
+                items.forEach((item) => {
+                    const img = new Image();
+                    img.src = item.popup; // 실제 경로 사용
+                });
+            }
+
+            // 페이지 로드 시 이미지 미리 로드
+            window.addEventListener("load", preloadImages);
+
+            function pickWeightedItem() {
+                const total = items.reduce((sum, item) => sum + item.chance, 0);
+                const rand = Math.random() * total;
+                let sum = 0;
+                for (const item of items) {
+                    sum += item.chance;
+                    if (rand < sum) return item;
+                }
+            }
+
+            function startRoulette() {
+                const rotateImg = document.querySelector("#rotate-img");
+                const rouletteBox = document.querySelector(".roulette-box");
+                const startBtn = document.querySelector(".start-btn");
+                const restartBtn = document.querySelector(".restart-btn");
+                const goldenBrownImg = document.querySelector(".golden-brown-img");
+
+                startBtn.style.pointerEvents = "none";
+                restartBtn.style.display = "none";
+
+                rotateImg.style.transition = "";
+                rotateImg.style.transform = "";
+
+                const animationDuration = 2500;
+                let startTime = Date.now();
+                let currentInterval = 100; // 초기 속도는 0.1초
+                let lastChangeTime = startTime;
+                let lastImage = null;
+
+                const finalItem = pickWeightedItem();
+
+                const animationInterval = setInterval(() => {
+                    const currentTime = Date.now();
+                    const elapsedTime = currentTime - startTime;
+
+                    const progress = elapsedTime / animationDuration;
+
+                    // 더 부드러운 감속을 위한 이징 함수
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                    const minInterval = 100; // 최소 간격 0.1초
+                    const maxInterval = 300; // 최대 간격 0.3초
+                    const intervalRange = maxInterval - minInterval;
+
+                    // 감속 시작 시점을 더 일찍 시작하도록 조정
+                    const adjustedProgress = progress < 0.6 ? 0 : (progress - 0.6) / 0.4;
+                    const smoothEase = Math.sin((adjustedProgress * Math.PI) / 2);
+                    currentInterval = minInterval + intervalRange * smoothEase;
+
+                    if (currentTime - lastChangeTime >= currentInterval) {
+                        if (elapsedTime >= animationDuration - 200) {
+                            goldenBrownImg.setAttribute("href", finalItem.img);
+                        } else {
+                            let randomIndex;
+                            let newImage;
+                            
+                            // 이전 이미지와 다른 이미지가 선택될 때까지 반복
+                            do {
+                                randomIndex = Math.floor(Math.random() * items.length);
+                                newImage = items[randomIndex];
+                            } while (lastImage && newImage.img === lastImage.img);
+                            
+                            lastImage = newImage;
+                            goldenBrownImg.setAttribute("href", lastImage.img);
+                        }
+                        lastChangeTime = currentTime;
+                    }
+
+                    if (elapsedTime >= animationDuration) {
+                        clearInterval(animationInterval);
+
+                        // 0.5초 후에 결과 화면 표시
+                        setTimeout(() => {
+                            showResultImage(finalItem.popup);
+                        }, 500);
+                    }
+                }, 16);
+            }
+
+            // 재시작 버튼 클릭 이벤트
+            document.querySelectorAll(".restart-btn").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    resetGame();
+                });
+            });
+
+            // 시작 버튼 클릭 이벤트
+            document.querySelector(".start-btn").addEventListener("click", startRoulette);
+
+            // bubbly animation
+            document.querySelectorAll(".bubbly-button").forEach((button) => {
+                button.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    button.classList.remove("animate");
+                    void button.offsetWidth;
+                    button.classList.add("animate");
+                    setTimeout(() => {
+                        button.classList.remove("animate");
+                    }, 700);
+                });
+            });
+
+            function showResultImage(imagePath) {
+                const resultBox = document.querySelector(".result-box");
+                const resultImage = resultBox.querySelector(".result-image img");
+                const rouletteBox = document.querySelector(".roulette-box");
+                const restartBtn = resultBox.querySelector(".restart-btn");
+                const lottieContainer = document.getElementById("lottie-container");
+
+                console.log("Showing result image and starting Lottie animation...");
+
+                resultBox.classList.add("show");
+                rouletteBox.style.opacity = "0";
+
+                // result-box에 show 클래스가 추가된 후 Lottie 애니메이션 실행
+                setTimeout(() => {
+                    if (lottieAnimation && isLottieLoaded) {
+                        console.log("Playing Lottie animation...");
+                        // 애니메이션을 처음부터 다시 시작
+                        lottieAnimation.goToAndStop(0, true);
+                        lottieContainer.classList.add("show");
+                        lottieAnimation.play();
+                    } else {
+                        console.error("Lottie animation not initialized or not loaded");
+                        // 애니메이션이 초기화되지 않았다면 다시 초기화 시도
+                        initLottieAnimation().then(() => {
+                            lottieAnimation.goToAndStop(0, true);
+                            lottieContainer.classList.add("show");
+                            lottieAnimation.play();
+                        });
+                    }
+                }, 100);
+
+                setTimeout(() => {
+                    rouletteBox.style.display = "none";
+                }, 200);
+
+                // 이미지 로드 후 결과 이미지 표시
+                const img = new Image();
+                img.onload = () => {
+                    resultImage.src = imagePath;
+                    restartBtn.style.display = "block";
+                };
+                img.src = imagePath;
+            }
+
+            function resetGame() {
+                const resultBox = document.querySelector(".result-box");
+                const rouletteBox = document.querySelector(".roulette-box");
+                const rotateImg = document.querySelector("#rotate-img");
+                const lottieContainer = document.getElementById("lottie-container");
+
+                // Lottie 애니메이션 초기화
+                if (lottieAnimation) {
+                    lottieAnimation.stop();
+                    lottieAnimation.destroy();
+                    lottieAnimation = null;
+                    isLottieLoaded = false;
+                }
+
+                // Lottie 컨테이너 초기화
+                lottieContainer.classList.remove("show", "initialized");
+                
+                // 게임 UI 초기화
+                resultBox.classList.remove("show");
+                rouletteBox.style.display = "flex";
+                rouletteBox.style.opacity = "1";
+                rotateImg.style.transform = "rotate(0deg)";
+                rotateImg.style.transition = "none";
+
+                // Lottie 애니메이션 다시 초기화
+                initLottieAnimation().catch(error => {
+                    console.error("Failed to reinitialize Lottie:", error);
+                });
+
+                // 스타트 버튼 이벤트 리스너 재설정
+                const startBtn = document.querySelector(".start-btn");
+                startBtn.style.pointerEvents = "";
+                startBtn.removeEventListener("click", startRoulette);
+                startBtn.addEventListener("click", startRoulette);
+            }
+
+            $(function () {
+                $(".fancy-button").mousedown(function () {
+                    $(this).bind("animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd", function () {
+                        $(this).removeClass("active");
+                    });
+                    $(this).addClass("active");
+                });
+            });
+        </script>
+    </body>
+</html>
