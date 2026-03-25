@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=1080, initial-scale=1.0" />
+        <title>짝 맞추기 게임</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background: url(./img/bg.png) repeat;
+                background-size: 100%;
+                font-family: "Pretendard", sans-serif;
+                overflow: hidden;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            /* ── Layout ─────────────────────────────────── */
+            .container {
+                width: 1080px;
+                height: 1920px;
+                margin: 0 auto;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* screens stack on top of each other */
+            .screen {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 1080px;
+                height: 1920px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .screen.hidden {
+                display: none;
+            }
+
+            /* ── Shared bottom deco (logo + notice + characters) ── */
+            .deco-bottom {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 620px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-end;
+                padding-bottom: 0;
+                pointer-events: none;
+            }
+
+            .deco-bottom .deco-logo {
+                width: 75%;
+                max-width: 640px;
+                margin-bottom: 40px;
+            }
+
+            .deco-bottom .deco-notice {
+                width: 100%;
+            }
+
+            /* ── START SCREEN (index.html과 동일) ───────────── */
+            #start-screen {
+                justify-content: center;
+            }
+
+            .start-wrap {
+                width: 880px;
+                height: 1920px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                padding: 40px;
+                position: relative;
+            }
+
+            .roulette-box {
+                display: flex;
+                justify-content: center;
+                position: relative;
+                margin-top: 300px;
+                width: 100%;
+                height: 800px;
+            }
+
+            .roulette-box .cha {
+                width: 70%;
+                position: absolute;
+                top: -229px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: -1;
+            }
+
+            .roulette-box .hand {
+                position: absolute;
+                width: 30%;
+                left: 188px;
+                top: -7px;
+                z-index: 3;
+            }
+
+            .roulette-box .star {
+                position: absolute;
+                top: -82px;
+                width: 65px;
+                right: 125px;
+            }
+
+            .roulette-circle {
+                background: url(./img/one2.png) center center no-repeat;
+                background-size: 100%;
+            }
+
+            .roulette-box .roulette-circle {
+                position: relative;
+                width: 100%;
+                max-width: 750px;
+                height: 800px;
+                aspect-ratio: 1 / 1;
+                z-index: 2;
+                display: flex;
+                justify-content: center;
+                margin: 0 auto;
+            }
+
+            .roulette-box .start-btn {
+                position: absolute;
+                width: 50%;
+                left: 50%;
+                bottom: -80px;
+                transform: translateX(-50%);
+                z-index: 3;
+                border: none;
+                background-color: transparent;
+                cursor: pointer;
+                max-width: 455px;
+                outline: none;
+                -webkit-tap-highlight-color: transparent;
+                padding: 0;
+            }
+
+            .roulette-box .start-btn:active {
+                transform: translateX(-50%) scale(0.94);
+            }
+
+            .roulette-box .start-btn img {
+                width: 100%;
+                height: 100%;
+                display: block;
+                -webkit-user-drag: none;
+            }
+
+            /* text-box 제거 → deco-bottom으로 통일 */
+
+            /* ── GAME SCREEN ─────────────────────────────── */
+            #game-screen {
+                padding: 56px 60px 0;
+            }
+
+            .game-header {
+                width: 960px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 28px;
+            }
+
+            .game-logo {
+                width: 200px;
+            }
+
+            .phase-label {
+                font-size: 38px;
+                font-weight: 900;
+                color: #fff;
+                text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+                background: rgba(0, 0, 0, 0.22);
+                border-radius: 50px;
+                padding: 12px 32px;
+                letter-spacing: -0.5px;
+            }
+
+            .score-label {
+                font-size: 42px;
+                font-weight: 900;
+                color: #ffe84d;
+                text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+                min-width: 120px;
+                text-align: right;
+            }
+
+            /* Timer row (hidden during reveal phase) */
+            .timer-row {
+                width: 960px;
+                display: flex;
+                align-items: center;
+                gap: 24px;
+                margin-bottom: 22px;
+                visibility: hidden;
+            }
+
+            .timer-row.visible {
+                visibility: visible;
+            }
+
+            .timer-number {
+                font-size: 80px;
+                font-weight: 900;
+                color: #fff;
+                text-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+                line-height: 1;
+                min-width: 110px;
+                text-align: center;
+                transition: color 0.3s;
+            }
+
+            .timer-number.urgent {
+                color: #ff4b4b;
+                animation: urgentPulse 0.5s ease-in-out infinite;
+            }
+
+            @keyframes urgentPulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+
+            .timer-bar-track {
+                flex: 1;
+                height: 28px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 14px;
+                overflow: hidden;
+            }
+
+            .timer-bar-fill {
+                height: 100%;
+                border-radius: 14px;
+                background: linear-gradient(90deg, #ff4b4b 0%, #ffe84d 50%, #4db848 100%);
+                transform-origin: right center;
+                /* width controlled via JS */
+            }
+
+            /* ── Cards Grid ──────────────────────────────── */
+            .cards-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+                width: 960px;
+            }
+
+            /* ── Individual Card ─────────────────────────── */
+            .card {
+                aspect-ratio: 220 / 268;
+                perspective: 1000px;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .card-inner {
+                width: 100%;
+                height: 100%;
+                position: relative;
+                transform-style: preserve-3d;
+                transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+                border-radius: 20px;
+            }
+
+            /* face-up = product image visible */
+            .card.face-up .card-inner,
+            .card.matched .card-inner {
+                transform: rotateY(180deg);
+            }
+
+            .card-back,
+            .card-face {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                -webkit-backface-visibility: hidden;
+                border-radius: 20px;
+                overflow: hidden;
+            }
+
+            /* Back of card */
+            .card-back {
+                background: url(./bg.png) repeat;
+                background-size: 60%;
+                border: 4px solid rgba(255, 255, 255, 0.28);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.2);
+            }
+
+            .card-back-mark {
+                display: none;
+            }
+
+            /* Front of card */
+            .card-face {
+                transform: rotateY(180deg);
+                background: #fff;
+            }
+
+            .card-face img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 16px;
+                -webkit-user-drag: none;
+                display: block;
+            }
+
+            /* Matched state */
+            .card.matched .card-face {
+                outline: 5px solid #ffe84d;
+                outline-offset: -5px;
+                box-shadow: 0 0 28px rgba(255, 232, 77, 0.85);
+            }
+
+            /* Wrong-blink animation */
+            .card.wrong-blink .card-face {
+                animation: wrongBlink 0.75s ease;
+            }
+
+            @keyframes wrongBlink {
+                0%, 100% { background: #fff; }
+                30%       { background: #ffcccc; }
+                70%       { background: #ffcccc; }
+            }
+
+            /* ── Reveal Countdown overlay ────────────────── */
+            #reveal-overlay {
+                position: absolute;
+                /* covers the card grid area */
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                pointer-events: none;
+                z-index: 50;
+            }
+
+            .reveal-number {
+                font-size: 260px;
+                font-weight: 900;
+                color: rgba(255, 235, 60, 0.92);
+                text-shadow:
+                    0 10px 0 rgba(0, 0, 0, 0.4),
+                    0 0 80px rgba(255, 230, 0, 0.6);
+                line-height: 1;
+                animation: revealPop 1s ease-out forwards;
+            }
+
+            @keyframes revealPop {
+                0%   { transform: scale(1.6); opacity: 0; }
+                25%  { transform: scale(1);   opacity: 1; }
+                75%  { transform: scale(1);   opacity: 1; }
+                100% { transform: scale(0.7); opacity: 0; }
+            }
+
+            /* ── RESULT SCREEN ───────────────────────────── */
+            #result-screen {
+                padding-top: 140px;
+                animation: fadeIn 0.4s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to   { opacity: 1; }
+            }
+
+            .result-prize-img {
+                width: 900px;
+                animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            @keyframes popIn {
+                from { transform: scale(0.5); opacity: 0; }
+                to   { transform: scale(1);   opacity: 1; }
+            }
+
+            .restart-btn {
+                width: 320px;
+                border: none;
+                background: transparent;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+                padding: 0;
+                margin-top: 48px;
+                transition: transform 0.12s;
+            }
+
+            .restart-btn:active {
+                transform: scale(0.94);
+            }
+
+            .restart-btn img {
+                width: 100%;
+                display: block;
+                -webkit-user-drag: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+
+            <!-- ══════════════ START SCREEN ══════════════ -->
+            <div class="screen" id="start-screen">
+                <div class="start-wrap">
+                    <!-- index.html .roulette-box와 동일 (인형 이미지만 제거) -->
+                    <div class="roulette-box">
+                        <img src="./img/line.png" alt="" class="cha" />
+                        <img src="./img/hand.png" alt="" class="hand" />
+                        <img src="./img/star.png" alt="" class="star" />
+                        <div class="roulette-circle">
+                            <!-- 동그라미만 표시, 내부 인형 이미지 없음 -->
+                        </div>
+                        <button class="start-btn" id="startBtn">
+                            <img src="./img/start.png" alt="START" draggable="false" />
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 게임/결과 화면과 동일한 deco-bottom 사용 -->
+                <div class="deco-bottom">
+                    <img class="deco-logo" src="./img/logo.png" alt="logo" />
+                    <img class="deco-notice" src="./img/notice.svg" alt="notice" />
+                </div>
+            </div>
+
+            <!-- ══════════════ GAME SCREEN ═══════════════ -->
+            <div class="screen hidden" id="game-screen">
+                <!-- Header: logo / phase label / score -->
+                <div class="game-header">
+                    <img class="game-logo" src="./img/logo.png" alt="logo" />
+                    <div class="phase-label" id="phaseLabel">카드를 기억하세요!</div>
+                    <div class="score-label" id="scoreLabel">0 / 6</div>
+                </div>
+
+                <!-- Match-phase timer row -->
+                <div class="timer-row" id="timerRow">
+                    <span class="timer-number" id="timerNumber">5</span>
+                    <div class="timer-bar-track">
+                        <div class="timer-bar-fill" id="timerBarFill" style="width:100%"></div>
+                    </div>
+                </div>
+
+                <!-- Card grid + reveal overlay wrapper -->
+                <div style="position:relative; width:960px;">
+                    <div class="cards-grid" id="cardsGrid"></div>
+                    <div id="reveal-overlay"></div>
+                </div>
+
+                <!-- Bottom decoration -->
+                <div class="deco-bottom">
+                    <img class="deco-logo" src="./img/logo.png" alt="logo" />
+                    <img class="deco-notice" src="./img/notice.svg" alt="notice" />
+                </div>
+            </div>
+
+            <!-- ══════════════ RESULT SCREEN ═════════════ -->
+            <div class="screen hidden" id="result-screen">
+                <img class="result-prize-img" id="resultImg" src="" alt="prize" />
+                <button class="restart-btn" id="restartBtn">
+                    <img src="./img/restart.png" alt="다시하기" />
+                </button>
+
+                <!-- Bottom decoration -->
+                <div class="deco-bottom">
+                    <img class="deco-logo" src="./img/logo.png" alt="logo" />
+                    <img class="deco-notice" src="./img/notice.svg" alt="notice" />
+                </div>
+            </div>
+
+        </div><!-- .container -->
+
+        <script>
+            // ════════════════════════════════════════════
+            //  CONFIG  (change values here as needed)
+            // ════════════════════════════════════════════
+            const REVEAL_SECONDS = 3;   // seconds cards stay face-up before flipping
+            const MATCH_SECONDS  = 5;   // seconds player has to match pairs
+            const TOTAL_PAIRS    = 6;   // 6 = 12 cards, 7 = 14 cards
+
+            // Product images available for the game
+            const ALL_PRODUCTS = [
+                "./img/product/img_1.webp",
+                "./img/product/img_2.webp",
+                "./img/product/img_3.webp",
+                "./img/product/img_4.webp",
+                "./img/product/img_5.webp",
+                "./img/product/img_6.webp",
+                "./img/product/img_7.webp",
+                "./img/product/img_8.webp",
+                "./img/product/img_9.webp",
+                "./img/product/img_10.webp",
+            ];
+
+            // Prize image per rank
+            // Replace these with actual prize images when ready
+            const PRIZE_IMAGES = {
+                1: "./img/popup_golden.png", // 1등: 3쌍 이상
+                2: "./img/popup_blue.png",   // 2등: 2쌍
+                3: "./img/popup_pink.png",   // 3등: 1쌍
+                4: "./img/popup_gray.png",   // 4등: 0쌍
+            };
+
+            // ════════════════════════════════════════════
+            //  STATE
+            // ════════════════════════════════════════════
+            let state = {};
+
+            function resetState() {
+                clearInterval(state.timerInterval);
+                state = {
+                    phase        : "start",
+                    deck         : [],
+                    flipped      : [],      // indices of currently face-up (unmatched) cards
+                    matchedPairs : 0,
+                    canFlip      : false,
+                    timerInterval: null,
+                    timeLeft     : MATCH_SECONDS,
+                };
+            }
+            resetState();
+
+            // ════════════════════════════════════════════
+            //  UTILS
+            // ════════════════════════════════════════════
+            function shuffle(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function buildDeck(pairs) {
+                const chosen = shuffle(ALL_PRODUCTS).slice(0, pairs);
+                return shuffle([...chosen, ...chosen]).map((src, i) => ({
+                    id     : i,
+                    src    : src,
+                    matched: false,
+                }));
+            }
+
+            function showScreen(id) {
+                document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
+                document.getElementById(id).classList.remove("hidden");
+            }
+
+            // ════════════════════════════════════════════
+            //  RENDER CARDS
+            // ════════════════════════════════════════════
+            function renderCards(deck, faceUp) {
+                const grid = document.getElementById("cardsGrid");
+                grid.innerHTML = "";
+
+                deck.forEach((card, idx) => {
+                    const el = document.createElement("div");
+                    el.className = "card" + (faceUp ? " face-up" : "");
+                    el.dataset.index = idx;
+                    el.innerHTML = `
+                        <div class="card-inner">
+                            <div class="card-back">
+                                <span class="card-back-mark">🐻</span>
+                            </div>
+                            <div class="card-face">
+                                <img src="${card.src}" alt="card" />
+                            </div>
+                        </div>`;
+                    el.addEventListener("click", () => onCardClick(idx));
+                    grid.appendChild(el);
+                });
+            }
+
+            function getCardEl(idx) {
+                return document.querySelectorAll(".card")[idx];
+            }
+
+            // ════════════════════════════════════════════
+            //  GAME FLOW
+            // ════════════════════════════════════════════
+            function startGame() {
+                resetState();
+                state.phase = "revealing";
+                state.deck  = buildDeck(TOTAL_PAIRS);
+
+                showScreen("game-screen");
+
+                // Reset UI
+                document.getElementById("phaseLabel").textContent = "카드를 기억하세요!";
+                document.getElementById("scoreLabel").textContent = `0 / ${TOTAL_PAIRS}`;
+                document.getElementById("timerRow").classList.remove("visible");
+                document.getElementById("timerNumber").classList.remove("urgent");
+                document.getElementById("reveal-overlay").innerHTML = "";
+
+                // Render all cards face-up so player can memorise
+                renderCards(state.deck, true);
+
+                // Run 3-second reveal countdown
+                runRevealCountdown(REVEAL_SECONDS, () => startMatchPhase());
+            }
+
+            // ── Reveal countdown ─────────────────────────
+            function runRevealCountdown(seconds, onDone) {
+                const overlay = document.getElementById("reveal-overlay");
+                let t = seconds;
+
+                function tick() {
+                    overlay.innerHTML = `<div class="reveal-number">${t}</div>`;
+                    if (t <= 0) {
+                        // Last number just shown – wait for its animation then call onDone
+                        setTimeout(() => {
+                            overlay.innerHTML = "";
+                            onDone();
+                        }, 900);
+                        return;
+                    }
+                    t--;
+                    setTimeout(tick, 1000);
+                }
+                tick();
+            }
+
+            // ── Match phase ───────────────────────────────
+            function startMatchPhase() {
+                state.phase   = "matching";
+                state.canFlip = true;
+
+                // Flip all cards face-down (staggered wave)
+                const cardEls = document.querySelectorAll(".card");
+                cardEls.forEach((el, i) => {
+                    setTimeout(() => el.classList.remove("face-up"), i * 35);
+                });
+
+                // Show timer row after wave finishes
+                const waveDelay = cardEls.length * 35 + 500;
+                setTimeout(() => {
+                    document.getElementById("phaseLabel").textContent = "짝을 맞춰보세요!";
+                    document.getElementById("timerRow").classList.add("visible");
+
+                    // Animate timer bar smoothly
+                    const fill = document.getElementById("timerBarFill");
+                    fill.style.transition = "none";
+                    fill.style.width = "100%";
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            fill.style.transition = `width ${MATCH_SECONDS}s linear`;
+                            fill.style.width = "0%";
+                        });
+                    });
+
+                    // Tick every second
+                    state.timeLeft = MATCH_SECONDS;
+                    updateTimerDisplay();
+
+                    state.timerInterval = setInterval(() => {
+                        state.timeLeft--;
+                        updateTimerDisplay();
+                        if (state.timeLeft <= 0) endGame();
+                    }, 1000);
+
+                }, waveDelay);
+            }
+
+            function updateTimerDisplay() {
+                const el = document.getElementById("timerNumber");
+                el.textContent = Math.max(0, state.timeLeft);
+                el.classList.toggle("urgent", state.timeLeft <= 5);
+            }
+
+            // ── End game ──────────────────────────────────
+            function endGame() {
+                clearInterval(state.timerInterval);
+                state.phase   = "result";
+                state.canFlip = false;
+
+                const matched = state.matchedPairs;
+                const rank = matched >= 3 ? 1 : matched === 2 ? 2 : matched === 1 ? 3 : 4;
+
+                setTimeout(() => {
+                    document.getElementById("resultImg").src = PRIZE_IMAGES[rank];
+                    showScreen("result-screen");
+                }, 700);
+            }
+
+            function restartGame() {
+                resetState();
+                showScreen("start-screen");
+            }
+
+            // ════════════════════════════════════════════
+            //  CARD INTERACTION
+            // ════════════════════════════════════════════
+            function onCardClick(idx) {
+                if (!state.canFlip || state.phase !== "matching") return;
+
+                const card = state.deck[idx];
+                if (card.matched) return;
+                if (state.flipped.includes(idx)) return;
+                if (state.flipped.length >= 2) return;
+
+                // Flip this card face-up
+                getCardEl(idx).classList.add("face-up");
+                state.flipped.push(idx);
+
+                if (state.flipped.length === 2) {
+                    state.canFlip = false;
+                    checkMatch();
+                }
+            }
+
+            function checkMatch() {
+                const [a, b] = state.flipped;
+                const cardA  = state.deck[a];
+                const cardB  = state.deck[b];
+
+                if (cardA.src === cardB.src) {
+                    // ── Match! ───────────────────────────
+                    cardA.matched = true;
+                    cardB.matched = true;
+                    state.matchedPairs++;
+
+                    getCardEl(a).classList.add("matched");
+                    getCardEl(b).classList.add("matched");
+
+                    state.flipped  = [];
+                    state.canFlip  = true;
+
+                    document.getElementById("scoreLabel").textContent =
+                        `${state.matchedPairs} / ${TOTAL_PAIRS}`;
+
+                    // All pairs found?
+                    if (state.matchedPairs === TOTAL_PAIRS) {
+                        setTimeout(endGame, 500);
+                    }
+                } else {
+                    // ── No match ─────────────────────────
+                    const elA = getCardEl(a);
+                    const elB = getCardEl(b);
+                    elA.classList.add("wrong-blink");
+                    elB.classList.add("wrong-blink");
+
+                    setTimeout(() => {
+                        elA.classList.remove("wrong-blink", "face-up");
+                        elB.classList.remove("wrong-blink", "face-up");
+                        state.flipped  = [];
+                        state.canFlip  = true;
+                    }, 900);
+                }
+            }
+
+            // ════════════════════════════════════════════
+            //  BUTTON BINDINGS
+            // ════════════════════════════════════════════
+            document.getElementById("startBtn").addEventListener("click", startGame);
+            document.getElementById("restartBtn").addEventListener("click", restartGame);
+
+            // Preload product images
+            ALL_PRODUCTS.forEach(src => { new Image().src = src; });
+            Object.values(PRIZE_IMAGES).forEach(src => { new Image().src = src; });
+        </script>
+    </body>
+</html>
