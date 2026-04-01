@@ -279,7 +279,7 @@
                 height: 100%;
                 position: relative;
                 transform-style: preserve-3d;
-                transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 border-radius: 20px;
             }
 
@@ -339,7 +339,7 @@
 
             /* Wrong-blink animation */
             .card.wrong-blink .card-face {
-                animation: wrongBlink 0.75s ease;
+                animation: wrongBlink 0.5s ease;
             }
 
             @keyframes wrongBlink {
@@ -656,11 +656,11 @@
                 // Flip all cards face-down (staggered wave)
                 const cardEls = document.querySelectorAll(".card");
                 cardEls.forEach((el, i) => {
-                    setTimeout(() => el.classList.remove("face-up"), i * 35);
+                    setTimeout(() => el.classList.remove("face-up"), i * 20);
                 });
 
                 // Show timer row after wave finishes
-                const waveDelay = cardEls.length * 35 + 500;
+                const waveDelay = cardEls.length * 20 + 300;
                 setTimeout(() => {
                     document.getElementById("phaseLabel").textContent = "짝을 맞춰보세요!";
                     document.getElementById("timerRow").classList.add("visible");
@@ -702,7 +702,7 @@
                 state.canFlip = false;
 
                 const matched = state.matchedPairs;
-                const rank = matched >= 3 ? 1 : matched === 2 ? 2 : matched === 1 ? 3 : 4;
+                const rank = matched >= 4 ? 1 : matched === 3 ? 2 : matched === 2 ? 3 : 4;
 
                 setTimeout(() => {
                     document.getElementById("resultImg").src = PRIZE_IMAGES[rank];
@@ -772,7 +772,7 @@
                         elB.classList.remove("wrong-blink", "face-up");
                         state.flipped  = [];
                         state.canFlip  = true;
-                    }, 900);
+                    }, 600);
                 }
             }
 
