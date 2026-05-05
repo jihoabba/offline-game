@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, initial-scale=1.0" />
     <title>행운의 뽑기</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet" />
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background: url(./img/bg.png) repeat;
             background-size: 100%;
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
@@ -27,138 +29,194 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 60px;
+            padding-top: 50px;
         }
 
-        /* ── 제목 ── */
-        .board-title {
-            font-size: 56px;
-            font-weight: 900;
-            color: #fff;
-            letter-spacing: -1px;
-            text-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 0 50px rgba(248,59,170,0.4);
-            margin-bottom: 20px;
-        }
-
-        /* ── 경품 칩 ── */
-        .prize-chips {
-            display: flex;
-            gap: 10px;
+        /* ── Title ── */
+        .title-wrap {
+            position: relative;
             width: 960px;
-            margin-bottom: 24px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .deco-star {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 1;
+            filter: drop-shadow(0 4px 0 rgba(0,0,0,0.3));
+        }
+        .deco-1 { top: 10px; left: 50px; transform: rotate(-15deg); }
+        .deco-2 { top: 30px; right: 40px; transform: rotate(20deg); }
+
+        .title-block { text-align: center; position: relative; z-index: 2; }
+        .title-sub {
+            display: inline-block;
+            background: #3F1F0E;
+            color: #FFD93B;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            padding: 6px 24px;
+            border-radius: 999px;
+            margin-bottom: 14px;
+        }
+        .title-main {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        .tword {
+            font-family: 'Black Han Sans', 'Pretendard', sans-serif;
+            font-size: 140px;
+            line-height: 0.95;
+            color: #FFD93B;
+            -webkit-text-stroke: 6px #3F1F0E;
+            paint-order: stroke fill;
+            text-shadow: 6px 6px 0 #3F1F0E, 6px 12px 0 rgba(0,0,0,0.25);
+            letter-spacing: -4px;
+            transform: rotate(-3deg);
+        }
+        .tword-2 {
+            color: #E85342;
+            transform: rotate(3deg) translateY(8px);
+        }
+        .title-tag {
+            margin-top: 14px;
+            font-size: 30px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 3px 0 rgba(0,0,0,0.4);
+            letter-spacing: -1px;
         }
 
+        /* ── Prize chips ── */
+        .prize-chips {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            width: 1000px;
+            margin-bottom: 26px;
+        }
         .prize-chip {
-            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            background: rgba(255,255,255,0.13);
-            border: 1.5px solid rgba(255,255,255,0.26);
+            background: #F5EBDA;
+            border: 4px solid #3F1F0E;
+            border-radius: 18px;
+            padding: 10px 4px 12px;
+            box-shadow: 0 6px 0 #3F1F0E;
+        }
+        .chip-img-wrap {
+            width: 110px;
+            height: 110px;
             border-radius: 16px;
-            padding: 12px 6px 10px;
-            color: #fff;
+            overflow: hidden;
+            border: 3px solid #3F1F0E;
+            background: #fff;
         }
-
-        .chip-icon { font-size: 28px; line-height: 1; }
-
+        .chip-img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .chip-name {
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: -0.2px;
-            text-align: center;
+            font-size: 21px;
+            font-weight: 800;
+            color: #3F1F0E;
+            letter-spacing: -0.5px;
             white-space: nowrap;
-            color: rgba(255,255,255,0.9);
         }
 
-        /* ── 9×9 그리드 ── */
+        /* ── 9×9 grid ── */
         .lottery-grid {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
-            gap: 9px;
-            width: 960px;
+            gap: 10px;
+            width: 1000px;
         }
-
-        /* ── 슬롯 ── */
         .slot {
             aspect-ratio: 1;
-            perspective: 500px;
+            position: relative;
+            cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
-        .slot:not(.opened) { cursor: pointer; }
-
-        .slot-inner {
-            width: 100%; height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.42s cubic-bezier(0.4,0,0.2,1);
-            border-radius: 10px;
-        }
-        .slot.opened .slot-inner { transform: rotateY(180deg); }
-
         .slot-back, .slot-front {
             position: absolute;
-            width: 100%; height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: 10px;
+            inset: 0;
+            border-radius: 12px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
-
-        /* 닫힌 면 — 문방구 뽑기 티켓 */
         .slot-back {
-            background: linear-gradient(155deg, #fffde7, #ffe57f);
-            border: 2px solid rgba(210,160,0,0.28);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.85);
-            gap: 3px;
+            background: #F5EBDA;
+            border: 3px solid #3F1F0E;
+            box-shadow: 0 4px 0 rgba(63, 31, 14, 0.35), inset 0 2px 0 rgba(255,255,255,0.5);
+            z-index: 2;
         }
-        .slot:not(.opened):active .slot-back {
-            background: linear-gradient(155deg, #fff9c4, #ffd740);
-            border-color: rgba(210,160,0,0.6);
+        .slot-stripes {
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent 0 6px,
+                rgba(232, 83, 66, 0.22) 6px 10px
+            );
         }
-        .slot-q   { font-size: 24px; line-height: 1; }
-        .slot-num { font-size: 13px; font-weight: 700; color: rgba(150,100,0,0.5); line-height: 1; }
-
-        /* 열린 면 */
-        .slot-front { transform: rotateY(180deg); padding: 4px; gap: 3px; }
-        .s-icon { font-size: 26px; line-height: 1; }
-        .s-name { font-size: 10px; font-weight: 700; text-align: center; line-height: 1.2; letter-spacing: -0.2px; }
-
-        /* 경품별 색상 */
-        .p-sticker   { background: linear-gradient(135deg,#e8f5e9,#c8e6c9); color: #1b5e20; }
-        .p-coupon20  { background: linear-gradient(135deg,#ede7f6,#d1c4e9); color: #311b92; }
-        .p-fragrance { background: linear-gradient(135deg,#fce4ec,#f8bbd0); color: #880e4f; }
-        .p-coin      { background: linear-gradient(135deg,#fff8e1,#ffe082); color: #bf360c; }
-        .p-fan       { background: linear-gradient(135deg,#e3f2fd,#bbdefb); color: #0d47a1; }
-        .p-coupon30  { background: linear-gradient(135deg,#fbe9e7,#ffccbc); color: #b71c1c; }
-
-        @keyframes slotGlow {
-            0%   { box-shadow: 0 0  0   rgba(255,220,0,0); }
-            40%  { box-shadow: 0 0 30px rgba(255,220,0,1), 0 0 55px rgba(255,220,0,0.55); }
-            100% { box-shadow: 0 0 10px rgba(255,220,0,0.25); }
+        .slot-q {
+            font-family: 'Black Han Sans', 'Pretendard', sans-serif;
+            font-size: 38px;
+            color: #3F1F0E;
+            line-height: 1;
+            position: relative;
+            z-index: 2;
         }
-        .slot.just-opened .slot-front { animation: slotGlow 1.3s ease-out forwards; }
+        .slot-num {
+            position: absolute;
+            top: 4px; left: 6px;
+            font-size: 11px;
+            font-weight: 900;
+            color: #3F1F0E;
+            z-index: 2;
+        }
+        .slot-front {
+            border: 3px solid;
+            padding: 4px;
+        }
+        .slot-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .slot.opened .slot-back { display: none; }
+        .slot.tearing .slot-back {
+            animation: tearAway 0.6s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+        }
+        @keyframes tearAway {
+            0%   { transform: translateY(0) rotate(0) scale(1); opacity: 1; clip-path: inset(0 0 0 0); }
+            30%  { transform: translateY(-30px) rotate(-3deg) scale(1.05); opacity: 1; clip-path: inset(20% 0 0 0); }
+            100% { transform: translateY(-300px) rotate(-12deg) scale(1.1); opacity: 0; clip-path: inset(60% 0 0 0); }
+        }
 
-        /* ── 하단 데코 ── */
+        /* ── Bottom logo / notice ── */
         .deco-bottom {
             position: absolute; bottom: 0; left: 0;
-            width: 100%; height: 620px;
+            width: 100%;
             display: flex; flex-direction: column;
             align-items: center; justify-content: flex-end;
             pointer-events: none;
         }
-        .deco-bottom .deco-logo { width: 75%; max-width: 640px; margin-bottom: 40px; }
+        .deco-bottom .deco-logo { width: 60%; max-width: 540px; margin-bottom: 24px; }
         .deco-bottom .deco-notice { width: 100%; }
 
-        /* ── 결과 오버레이 ── */
+        /* ── Result popup ── */
         #result-overlay {
             position: absolute; top: 0; left: 0;
             width: 1080px; height: 1920px;
-            background: rgba(0,0,0,0.72);
+            background: rgba(0,0,0,0.65);
             display: flex; align-items: center; justify-content: center;
             z-index: 200;
         }
@@ -171,70 +229,117 @@
         }
 
         .result-card {
-            width: 860px;
-            background: #fff;
+            width: 820px;
+            background: #F5EBDA;
+            border: 8px solid #3F1F0E;
             border-radius: 48px;
-            padding: 72px 60px 64px;
+            padding: 60px 60px 56px;
             display: flex; flex-direction: column; align-items: center;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+            box-shadow: 0 16px 0 rgba(63,31,14,0.4);
             position: relative; z-index: 202;
-            animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         @keyframes popIn {
-            from { transform: scale(0.5); opacity: 0; }
-            to   { transform: scale(1);   opacity: 1; }
+            from { transform: scale(0.6) rotate(-3deg); opacity: 0; }
+            to   { transform: scale(1) rotate(0); opacity: 1; }
         }
-
         .result-badge {
-            background: linear-gradient(135deg, #f83baa, #7c3eee);
-            color: #fff; font-size: 28px; font-weight: 700;
-            padding: 10px 34px; border-radius: 50px; margin-bottom: 36px;
+            background: #E85342;
+            color: #fff;
+            font-size: 32px;
+            font-weight: 900;
+            padding: 10px 36px;
+            border-radius: 999px;
+            border: 4px solid #3F1F0E;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 0 #3F1F0E;
             letter-spacing: 0.5px;
         }
-        .result-icon {
-            font-size: 150px; line-height: 1; margin-bottom: 24px;
-            animation: floatBounce 0.9s ease-in-out infinite alternate;
+        .result-char-wrap {
+            width: 380px; height: 380px;
+            border-radius: 50%;
+            background: #fff;
+            border: 6px solid #3F1F0E;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
         }
-        @keyframes floatBounce {
-            from { transform: translateY(0) rotate(-4deg); }
-            to   { transform: translateY(-22px) rotate(4deg); }
+        .result-char {
+            width: 92%; height: 92%; object-fit: contain;
+            animation: bob 1.6s ease-in-out infinite alternate;
+        }
+        @keyframes bob {
+            from { transform: translateY(0) rotate(-2deg); }
+            to   { transform: translateY(-12px) rotate(2deg); }
         }
         .result-name {
-            font-size: 76px; font-weight: 900; color: #111;
-            letter-spacing: -1.5px; text-align: center; margin-bottom: 14px;
+            font-family: 'Black Han Sans', 'Pretendard', sans-serif;
+            font-size: 88px;
+            color: #3F1F0E;
+            line-height: 1;
+            margin-bottom: 8px;
+            letter-spacing: -2px;
         }
         .result-desc {
-            font-size: 30px; color: #888;
-            text-align: center; letter-spacing: -0.3px; margin-bottom: 62px;
+            font-size: 30px;
+            color: #5A3318;
+            margin-bottom: 36px;
+            text-align: center;
         }
         .result-confirm {
-            width: 440px; height: 104px;
-            background: linear-gradient(135deg, #f83baa, #7c3eee);
-            border: none; border-radius: 52px;
-            color: #fff; font-size: 44px; font-weight: 900; letter-spacing: -0.5px;
-            font-family: 'Pretendard', sans-serif; cursor: pointer;
-            box-shadow: 0 10px 34px rgba(248,59,170,0.45);
+            width: 480px; height: 110px;
+            background: #2BA876;
+            border: 5px solid #3F1F0E;
+            border-radius: 999px;
+            color: #fff;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 44px; font-weight: 900;
+            letter-spacing: -1px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #3F1F0E;
             -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .result-confirm:active { transform: scale(0.96); }
+        .result-confirm:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #3F1F0E;
+        }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <div class="board-title">행운의 뽑기</div>
+    <!-- Title -->
+    <div class="title-wrap">
+        <svg class="deco-star deco-1" viewBox="0 0 40 40">
+            <path d="M20 2 L24 16 L38 18 L27 27 L31 40 L20 32 L9 40 L13 27 L2 18 L16 16 Z" fill="#FFD93B" stroke="#3F1F0E" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+        <svg class="deco-star deco-2" viewBox="0 0 40 40">
+            <path d="M20 2 L24 16 L38 18 L27 27 L31 40 L20 32 L9 40 L13 27 L2 18 L16 16 Z" fill="#E85342" stroke="#3F1F0E" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+        <div class="title-block">
+            <div class="title-sub">LUCKY DRAW</div>
+            <div class="title-main">
+                <span class="tword">행운의</span>
+                <span class="tword tword-2">뽑기</span>
+            </div>
+            <div class="title-tag">81칸 중 한 칸을 골라 행운을 뜯어보세요!</div>
+        </div>
+    </div>
 
     <div class="prize-chips" id="prizeChips"></div>
 
     <div class="lottery-grid" id="lotteryGrid"></div>
 
-    <!-- 결과 오버레이 -->
+    <!-- Result overlay -->
     <div id="result-overlay" class="hidden">
         <canvas id="confetti-canvas" width="1080" height="1920"></canvas>
         <div class="result-card">
             <div class="result-badge">🎉 당첨!</div>
-            <div class="result-icon" id="resultIcon">⭐</div>
+            <div class="result-char-wrap">
+                <img class="result-char" id="resultChar" src="" alt="" />
+            </div>
             <div class="result-name" id="resultName">스티커</div>
             <div class="result-desc" id="resultDesc">카운터에서 수령하세요</div>
             <button class="result-confirm" id="confirmBtn">확인</button>
@@ -242,26 +347,25 @@
     </div>
 
     <div class="deco-bottom">
-        <img class="deco-logo" src="./img/logo.png" alt="logo" />
         <img class="deco-notice" src="./img/notice.svg" alt="notice" />
     </div>
 
 </div>
+
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
-// 81칸 비율 배분: 스티커 62 · 20%쿠폰 5 · 방향제 5 · 코인 4 · 부채 3 · 30%쿠폰 2
 var PRIZES = [
-    { id:'sticker',   name:'스티커',        short:'스티커',  icon:'⭐', count:62, desc:'카운터에서 수령하세요' },
-    { id:'coupon20',  name:'20% 할인쿠폰',  short:'20%쿠폰', icon:'🎫', count:5,  desc:'구매 시 사용 가능합니다' },
-    { id:'fragrance', name:'방향제',        short:'방향제',  icon:'🌸', count:5,  desc:'카운터에서 수령하세요' },
-    { id:'coin',      name:'인형뽑기 코인', short:'뽑기코인',icon:'🪙', count:4,  desc:'인형뽑기 기계에서 사용하세요' },
-    { id:'fan',       name:'부채',          short:'부채',    icon:'🌀', count:3,  desc:'카운터에서 수령하세요' },
-    { id:'coupon30',  name:'30% 할인쿠폰',  short:'30%쿠폰', icon:'🎁', count:2,  desc:'구매 시 사용 가능합니다' },
+    { id:'sticker',   name:'스티커',        short:'스티커',  count:62, desc:'카운터에서 수령하세요',         char:'noo_pink',   color:'#F1C8C8' },
+    { id:'coupon20',  name:'20% 할인쿠폰',  short:'20%쿠폰', count:5,  desc:'구매 시 사용 가능합니다',       char:'noo_pink',   color:'#E85342' },
+    { id:'fragrance', name:'방향제',        short:'방향제',  count:5,  desc:'카운터에서 수령하세요',         char:'noo_blue',   color:'#1E76C9' },
+    { id:'coin',      name:'인형뽑기 코인', short:'뽑기코인',count:4,  desc:'인형뽑기 기계에서 사용하세요',  char:'noo_gray',   color:'#C9C2BA' },
+    { id:'fan',       name:'부채',          short:'부채',    count:3,  desc:'카운터에서 수령하세요',         char:'noo_blue',   color:'#1E76C9' },
+    { id:'coupon30',  name:'30% 할인쿠폰',  short:'30%쿠폰', count:2,  desc:'구매 시 사용 가능합니다',       char:'noo_golden', color:'#F8E22B' },
 ];
 
 var STORAGE_KEY = 'lfs_draw_session';
 
-// ── BOARD GENERATION ──────────────────────────────────────────────────────
+// ── Board ──────────────────────────────────────────────────────────────────
 function buildPool() {
     var pool = [];
     PRIZES.forEach(function(p) {
@@ -269,7 +373,6 @@ function buildPool() {
     });
     return shuffle(pool);
 }
-
 function createState() {
     var pool = buildPool();
     return {
@@ -278,19 +381,13 @@ function createState() {
         })
     };
 }
-
-// ── PERSISTENCE (sessionStorage → 새로고침 시 초기화) ─────────────────────
 function loadState() {
-    try {
-        return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null');
-    } catch(e) { return null; }
+    try { return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null'); }
+    catch(e) { return null; }
 }
-
 function saveState() {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
 }
-
-// ── UTILS ─────────────────────────────────────────────────────────────────
 function shuffle(arr) {
     var a = arr.slice();
     for (var i = a.length - 1; i > 0; i--) {
@@ -299,7 +396,6 @@ function shuffle(arr) {
     }
     return a;
 }
-
 function getPrize(id) {
     for (var i = 0; i < PRIZES.length; i++) {
         if (PRIZES[i].id === id) return PRIZES[i];
@@ -307,7 +403,7 @@ function getPrize(id) {
     return null;
 }
 
-// ── RENDER: 경품 칩 ───────────────────────────────────────────────────────
+// ── Render: chips ─────────────────────────────────────────────────────────
 function renderPrizeChips() {
     var container = document.getElementById('prizeChips');
     while (container.firstChild) container.removeChild(container.firstChild);
@@ -316,21 +412,27 @@ function renderPrizeChips() {
         var chip = document.createElement('div');
         chip.className = 'prize-chip';
 
-        var icon = document.createElement('div');
-        icon.className = 'chip-icon';
-        icon.textContent = p.icon;
+        var imgWrap = document.createElement('div');
+        imgWrap.className = 'chip-img-wrap';
+
+        var img = document.createElement('img');
+        img.className = 'chip-img';
+        img.src = './img/' + p.char + '_crop.png';
+        img.alt = '';
+
+        imgWrap.appendChild(img);
 
         var name = document.createElement('div');
         name.className = 'chip-name';
         name.textContent = p.name;
 
-        chip.appendChild(icon);
+        chip.appendChild(imgWrap);
         chip.appendChild(name);
         container.appendChild(chip);
     });
 }
 
-// ── RENDER: 보드 ──────────────────────────────────────────────────────────
+// ── Render: grid ──────────────────────────────────────────────────────────
 function renderGrid() {
     var grid = document.getElementById('lotteryGrid');
     while (grid.firstChild) grid.removeChild(grid.firstChild);
@@ -341,36 +443,38 @@ function renderGrid() {
         var el = document.createElement('div');
         el.className = 'slot' + (slot.opened ? ' opened' : '');
 
-        var inner = document.createElement('div');
-        inner.className = 'slot-inner';
-
-        // 닫힌 면
+        // Back
         var back = document.createElement('div');
         back.className = 'slot-back';
-        var q = document.createElement('div');
-        q.className = 'slot-q';
-        q.textContent = '🎰';
+
         var num = document.createElement('div');
         num.className = 'slot-num';
         num.textContent = slot.num;
-        back.appendChild(q);
+
+        var stripes = document.createElement('div');
+        stripes.className = 'slot-stripes';
+
+        var q = document.createElement('div');
+        q.className = 'slot-q';
+        q.textContent = '?';
+
         back.appendChild(num);
+        back.appendChild(stripes);
+        back.appendChild(q);
 
-        // 열린 면
+        // Front (revealed)
         var front = document.createElement('div');
-        front.className = 'slot-front p-' + slot.prizeId;
-        var sIcon = document.createElement('div');
-        sIcon.className = 's-icon';
-        sIcon.textContent = prize.icon;
-        var sName = document.createElement('div');
-        sName.className = 's-name';
-        sName.textContent = prize.short;
-        front.appendChild(sIcon);
-        front.appendChild(sName);
+        front.className = 'slot-front';
+        front.style.background = prize.color + '22';
+        front.style.borderColor = prize.color;
 
-        inner.appendChild(back);
-        inner.appendChild(front);
-        el.appendChild(inner);
+        var fImg = document.createElement('img');
+        fImg.src = './img/' + prize.char + '_crop.png';
+        fImg.alt = '';
+        front.appendChild(fImg);
+
+        el.appendChild(back);
+        el.appendChild(front);
 
         if (!slot.opened) {
             (function(i, elem) {
@@ -382,7 +486,7 @@ function renderGrid() {
     });
 }
 
-// ── SLOT CLICK ────────────────────────────────────────────────────────────
+// ── Slot click → tear-up animation → result ──────────────────────────────
 var isAnimating = false;
 
 function onSlotClick(idx, el) {
@@ -391,18 +495,22 @@ function onSlotClick(idx, el) {
     if (slot.opened) return;
 
     isAnimating = true;
-    slot.opened = true;
-    saveState();
+    el.classList.add('tearing');
 
-    el.classList.add('opened', 'just-opened');
+    setTimeout(function() {
+        slot.opened = true;
+        saveState();
+        el.classList.remove('tearing');
+        el.classList.add('opened');
 
-    setTimeout(function() { showResult(slot.prizeId); }, 550);
+        setTimeout(function() { showResult(slot.prizeId); }, 250);
+    }, 600);
 }
 
-// ── RESULT ────────────────────────────────────────────────────────────────
+// ── Result ────────────────────────────────────────────────────────────────
 function showResult(prizeId) {
     var prize = getPrize(prizeId);
-    document.getElementById('resultIcon').textContent = prize.icon;
+    document.getElementById('resultChar').src = './img/' + prize.char + '_crop.png';
     document.getElementById('resultName').textContent = prize.name;
     document.getElementById('resultDesc').textContent = prize.desc;
     document.getElementById('result-overlay').classList.remove('hidden');
@@ -414,7 +522,6 @@ document.getElementById('confirmBtn').addEventListener('click', function() {
     stopConfetti();
     isAnimating = false;
 
-    // 81칸 전부 열렸으면 새 보드 자동 생성 (같은 세션 안에서)
     var allOpened = true;
     for (var i = 0; i < gameState.slots.length; i++) {
         if (!gameState.slots[i].opened) { allOpened = false; break; }
@@ -426,8 +533,8 @@ document.getElementById('confirmBtn').addEventListener('click', function() {
     }
 });
 
-// ── CONFETTI ──────────────────────────────────────────────────────────────
-var CC = ['#f83baa','#7c3eee','#ffe84d','#4db848','#4fc3f7','#ff8a65','#fff'];
+// ── Confetti ──────────────────────────────────────────────────────────────
+var CC = ['#FFD93B','#E85342','#2BA876','#1E76C9','#F8E22B','#fff','#F1C8C8'];
 var confettiRAF = null;
 
 function startConfetti() {
@@ -461,13 +568,12 @@ function startConfetti() {
     }
     tick();
 }
-
 function stopConfetti() {
     if (confettiRAF) { cancelAnimationFrame(confettiRAF); confettiRAF = null; }
     document.getElementById('confetti-canvas').getContext('2d').clearRect(0, 0, 1080, 1920);
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────────
 var gameState = loadState() || createState();
 saveState();
 renderPrizeChips();
